@@ -3,10 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { vehiclesApi, bookingsApi, VehicleResponse } from '@/lib/api';
+import { vehiclesApi, bookingsApi, VehicleResponse, BookingResponse } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/Toast';
 import { useCurrency } from '@/lib/currency-context';
+import ReceiptModal from '@/components/ReceiptModal';
 
 // ─── Icons ────────────────────────────────────────────────────────────────
 const BackIcon = () => (
@@ -134,6 +135,7 @@ export default function VehicleDetailPage() {
   const [selectedInsurance, setSelectedInsurance] = useState('basic');
   const [wishlisted, setWishlisted] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [receiptBooking, setReceiptBooking] = useState<BookingResponse | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -181,6 +183,7 @@ export default function VehicleDetailPage() {
         startDate,
         endDate,
       });
+      setReceiptBooking(booking);
       toast(`Booking confirmed! ID: ${booking.id.slice(0, 8).toUpperCase()} · Total: ${formatPrice(booking.totalCost)}`, 'success');
       setStartDate('');
       setEndDate('');
@@ -646,6 +649,12 @@ export default function VehicleDetailPage() {
           .vehicle-detail-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
+
+      {/* Official Receipt & Tax Invoice Modal */}
+      <ReceiptModal
+        booking={receiptBooking}
+        onClose={() => setReceiptBooking(null)}
+      />
     </div>
   );
 }

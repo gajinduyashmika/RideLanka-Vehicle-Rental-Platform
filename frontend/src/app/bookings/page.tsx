@@ -7,6 +7,7 @@ import { bookingsApi, BookingResponse } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/Toast';
 import { useCurrency } from '@/lib/currency-context';
+import ReceiptModal from '@/components/ReceiptModal';
 
 // ─── Icons ────────────────────────────────────────────────────────────────
 const CarIcon = () => (
@@ -77,7 +78,15 @@ const tabs = [
   { id: 'CANCELLED', label: 'Cancelled' },
 ];
 
-function BookingCard({ booking, onCancel }: { booking: BookingResponse; onCancel: (id: string) => void }) {
+function BookingCard({
+  booking,
+  onCancel,
+  onViewReceipt,
+}: {
+  booking: BookingResponse;
+  onCancel: (id: string) => void;
+  onViewReceipt: (b: BookingResponse) => void;
+}) {
   const [cancelling, setCancelling] = useState(false);
   const { formatPrice } = useCurrency();
   const sc = statusConfig[booking.status] ?? { badge: '', label: booking.status, color: 'var(--text-muted)' };
@@ -171,9 +180,9 @@ function BookingCard({ booking, onCancel }: { booking: BookingResponse; onCancel
               View Vehicle <ArrowRightIcon />
             </Link>
             <button
-              onClick={() => { navigator.clipboard?.writeText(booking.id); }}
+              onClick={() => onViewReceipt(booking)}
               className="btn btn-ghost btn-sm"
-              title="Copy booking ID"
+              title="View & Print Official Receipt"
             >
               <DownloadIcon /> Receipt
             </button>
@@ -202,6 +211,7 @@ export default function BookingsPage() {
   const [bookings, setBookings] = useState<BookingResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
+  const [receiptBooking, setReceiptBooking] = useState<BookingResponse | null>(null);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -357,12 +367,22 @@ export default function BookingsPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {filtered.map((b, i) => (
               <div key={b.id} className="animate-fade-in" style={{ animationDelay: `${i * 60}ms` }}>
-                <BookingCard booking={b} onCancel={handleCancel} />
+                <BookingCard
+                  booking={b}
+                  onCancel={handleCancel}
+                  onViewReceipt={setReceiptBooking}
+                />
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Official Receipt & Tax Invoice Modal */}
+      <ReceiptModal
+        booking={receiptBooking}
+        onClose={() => setReceiptBooking(null)}
+      />
     </div>
   );
 }

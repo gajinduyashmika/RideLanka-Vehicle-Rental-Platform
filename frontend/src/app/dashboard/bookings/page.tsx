@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { bookingsApi, BookingResponse } from '@/lib/api';
 import { useToast } from '@/components/Toast';
 import { useCurrency } from '@/lib/currency-context';
+import ReceiptModal from '@/components/ReceiptModal';
 
 const RefreshIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -17,6 +18,7 @@ export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<BookingResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('ALL');
+  const [receiptBooking, setReceiptBooking] = useState<BookingResponse | null>(null);
   const { toast } = useToast();
 
   useEffect(() => { load(); }, []);
@@ -202,14 +204,23 @@ export default function AdminBookingsPage() {
                       </span>
                     </td>
                     <td>
-                      {b.status === 'CONFIRMED' && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <button
-                          onClick={() => handleCancel(b.id)}
-                          className="btn btn-danger btn-sm"
+                          onClick={() => setReceiptBooking(b)}
+                          className="btn btn-secondary btn-sm"
+                          title="View & Print Official Receipt"
                         >
-                          Cancel
+                          Receipt
                         </button>
-                      )}
+                        {b.status === 'CONFIRMED' && (
+                          <button
+                            onClick={() => handleCancel(b.id)}
+                            className="btn btn-danger btn-sm"
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -218,6 +229,12 @@ export default function AdminBookingsPage() {
           </div>
         )}
       </div>
+
+      {/* Official Receipt & Tax Invoice Modal */}
+      <ReceiptModal
+        booking={receiptBooking}
+        onClose={() => setReceiptBooking(null)}
+      />
     </div>
   );
 }
