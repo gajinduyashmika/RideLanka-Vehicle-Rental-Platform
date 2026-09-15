@@ -53,6 +53,7 @@ public class SecurityConfig {
                         ).permitAll()
 
                         // Admin-only endpoints
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/vehicles/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/vehicles/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/vehicles/**").hasRole("ADMIN")

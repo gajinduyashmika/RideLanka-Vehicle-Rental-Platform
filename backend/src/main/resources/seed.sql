@@ -1,10 +1,10 @@
 -- Seed Customers
-INSERT INTO users (id, full_name, email, password, role, created_at)
+INSERT INTO users (id, full_name, email, password, role, phone_number, driving_license_number, city, address, enabled, created_at)
 VALUES 
-  ('a1111111-1111-1111-1111-111111111111', 'Sarah Miller', 'sarah.m@gmail.com', '$2a$10$IIZRVKdTnZHAJcKTvvzPgOz4bGxt1k4MYZUs1JdvGdbc7yjRZOMB.', 'CUSTOMER', NOW() - INTERVAL '20 days'),
-  ('a2222222-2222-2222-2222-222222222222', 'James Tanaka', 'james.k@gmail.com', '$2a$10$IIZRVKdTnZHAJcKTvvzPgOz4bGxt1k4MYZUs1JdvGdbc7yjRZOMB.', 'CUSTOMER', NOW() - INTERVAL '15 days'),
-  ('a3333333-3333-3333-3333-333333333333', 'Priya Sharma', 'priya.r@gmail.com', '$2a$10$IIZRVKdTnZHAJcKTvvzPgOz4bGxt1k4MYZUs1JdvGdbc7yjRZOMB.', 'CUSTOMER', NOW() - INTERVAL '10 days'),
-  ('a4444444-4444-4444-4444-444444444444', 'Kasun Perera', 'kasun.p@gmail.com', '$2a$10$IIZRVKdTnZHAJcKTvvzPgOz4bGxt1k4MYZUs1JdvGdbc7yjRZOMB.', 'CUSTOMER', NOW() - INTERVAL '5 days')
+  ('a1111111-1111-1111-1111-111111111111', 'Sarah Miller', 'sarah.m@gmail.com', '$2a$10$IIZRVKdTnZHAJcKTvvzPgOz4bGxt1k4MYZUs1JdvGdbc7yjRZOMB.', 'CUSTOMER', '+94 77 123 4567', 'B1928472', 'Galle', '45 Rampart Street, Galle Fort', true, NOW() - INTERVAL '20 days'),
+  ('a2222222-2222-2222-2222-222222222222', 'James Tanaka', 'james.k@gmail.com', '$2a$10$IIZRVKdTnZHAJcKTvvzPgOz4bGxt1k4MYZUs1JdvGdbc7yjRZOMB.', 'CUSTOMER', '+94 71 456 7890', 'B3829104', 'Mirissa', '12 Coconut Tree Hill Rd, Mirissa', true, NOW() - INTERVAL '15 days'),
+  ('a3333333-3333-3333-3333-333333333333', 'Priya Sharma', 'priya.r@gmail.com', '$2a$10$IIZRVKdTnZHAJcKTvvzPgOz4bGxt1k4MYZUs1JdvGdbc7yjRZOMB.', 'CUSTOMER', '+94 76 789 0123', 'B9482019', 'Colombo', '88 Galle Face Terrace, Colombo 03', true, NOW() - INTERVAL '10 days'),
+  ('a4444444-4444-4444-4444-444444444444', 'Kasun Perera', 'kasun.p@gmail.com', '$2a$10$IIZRVKdTnZHAJcKTvvzPgOz4bGxt1k4MYZUs1JdvGdbc7yjRZOMB.', 'CUSTOMER', '+94 77 890 1234', 'B7583921', 'Matara', '23 Beach Road, Matara Central', true, NOW() - INTERVAL '5 days')
 ON CONFLICT (email) DO NOTHING;
 
 -- Seed Vehicles

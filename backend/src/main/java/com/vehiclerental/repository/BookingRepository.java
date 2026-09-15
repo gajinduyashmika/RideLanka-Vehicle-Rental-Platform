@@ -44,4 +44,9 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
      * Find bookings by status.
      */
     List<Booking> findByStatusOrderByStartDateAsc(BookingStatus status);
+
+    /**
+     * Count total bookings for a specific customer.
+     */
+    long countByCustomerId(UUID customerId);
 }

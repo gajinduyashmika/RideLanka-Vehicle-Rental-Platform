@@ -37,6 +37,15 @@ const BookingsIcon = () => (
   </svg>
 );
 
+const UsersIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+    <circle cx="9" cy="7" r="4"/>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+);
+
 const ExternalIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
@@ -70,6 +79,7 @@ const navSections: Array<{ title: string; items: NavItem[] }> = [
     title: 'Operations',
     items: [
       { href: '/dashboard/bookings', label: 'All Bookings', icon: <BookingsIcon /> },
+      { href: '/dashboard/users', label: 'User Management', icon: <UsersIcon /> },
     ],
   },
 ];

@@ -38,6 +38,22 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
+    @Column
+    private String phoneNumber;
+
+    @Column
+    private String drivingLicenseNumber;
+
+    @Column
+    private String address;
+
+    @Column
+    private String city;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean enabled = true;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -69,6 +85,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 }

@@ -81,6 +81,39 @@ export const bookingsApi = {
     fetchApi<BookingResponse>(`/bookings/${id}/cancel`, { method: 'PATCH' }),
 };
 
+export const userApi = {
+  getProfile: () =>
+    fetchApi<UserProfileResponse>('/users/me'),
+  updateProfile: (data: UpdateProfileRequest) =>
+    fetchApi<UserProfileResponse>('/users/me', { method: 'PUT', body: JSON.stringify(data) }),
+  changePassword: (data: ChangePasswordRequest) =>
+    fetchApi<{ message: string }>('/users/me/password', { method: 'PUT', body: JSON.stringify(data) }),
+};
+
+export const adminUserApi = {
+  getAll: (params?: { search?: string; role?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.search) query.set('search', params.search);
+    if (params?.role && params.role !== 'ALL') query.set('role', params.role);
+    const qs = query.toString() ? `?${query.toString()}` : '';
+    return fetchApi<UserProfileResponse[]>(`/admin/users${qs}`);
+  },
+  getById: (id: string) =>
+    fetchApi<UserProfileResponse>(`/admin/users/${id}`),
+  updateRole: (id: string, role: string) =>
+    fetchApi<UserProfileResponse>(`/admin/users/${id}/role`, {
+      method: 'PATCH',
+      body: JSON.stringify({ role }),
+    }),
+  updateStatus: (id: string, enabled: boolean) =>
+    fetchApi<UserProfileResponse>(`/admin/users/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ enabled }),
+    }),
+  delete: (id: string) =>
+    fetchApi<{ message: string }>(`/admin/users/${id}`, { method: 'DELETE' }),
+};
+
 // Types
 export interface RegisterRequest {
   fullName: string;
@@ -155,4 +188,31 @@ export interface BookingResponse {
   totalCost: number;
   status: string;
   createdAt: string;
+}
+
+export interface UserProfileResponse {
+  id: string;
+  email: string;
+  fullName: string;
+  phoneNumber?: string;
+  drivingLicenseNumber?: string;
+  address?: string;
+  city?: string;
+  role: 'CUSTOMER' | 'ADMIN';
+  enabled: boolean;
+  createdAt: string;
+  totalBookings: number;
+}
+
+export interface UpdateProfileRequest {
+  fullName: string;
+  phoneNumber?: string;
+  drivingLicenseNumber?: string;
+  address?: string;
+  city?: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
 }
