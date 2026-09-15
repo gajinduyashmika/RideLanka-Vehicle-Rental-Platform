@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: vehicle-rental-backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/vehicle_rental_db
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: Asia/Colombo
+
+server:
+  port: 8080
+
+app:
+  jwt:
+    secret: f8a3b7c9d2e1f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9
+    expiration-ms: 86400000
+
+  cors:
+    allowed-origins: http://localhost:3000
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
