@@ -1,4 +1,4 @@
-# 🚗 RideLanka — Luxury Vehicle Rental & Mobility Platform
+# 🚗 RideLanka - Luxury Vehicle Rental & Mobility Platform
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.3.5-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.2.8-blue?style=for-the-badge&logo=react)](https://react.dev/)
