@@ -140,10 +140,10 @@ export default function EditVehiclePage() {
             </select>
           </div>
           <div>
-            <label className="input-label">Daily Rate ($)</label>
+            <label className="input-label">Daily Rate (LKR - Rs.)</label>
             <input type="number" value={form.dailyRate}
               onChange={e => handleChange('dailyRate', parseFloat(e.target.value))}
-              className="input-field" min={0.01} step={0.01} required />
+              className="input-field" min={100} step={100} required />
           </div>
           <div>
             <label className="input-label">Branch</label>

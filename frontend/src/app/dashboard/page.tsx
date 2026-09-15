@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { vehiclesApi, bookingsApi, VehicleResponse, BookingResponse } from '@/lib/api';
+import { useToast } from '@/components/Toast';
+import { useCurrency } from '@/lib/currency-context';
 
 // ─── Icons ────────────────────────────────────────────────────────────────
 const CarKpiIcon = () => (
@@ -133,6 +135,7 @@ function FleetDonut({ available, rented, maintenance }: { available: number; ren
 }
 
 export default function DashboardPage() {
+  const { formatPrice } = useCurrency();
   const [vehicles, setVehicles] = useState<VehicleResponse[]>([]);
   const [bookings, setBookings] = useState<BookingResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -211,8 +214,8 @@ export default function DashboardPage() {
     },
     {
       label: 'Total Revenue',
-      value: `$${totalRevenue.toLocaleString()}`,
-      sub: `$${todayRevenue} today`,
+      value: formatPrice(totalRevenue),
+      sub: `${formatPrice(todayRevenue)} today`,
       icon: <DollarKpiIcon />,
       color: 'var(--amber-400)',
       gradient: 'linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.04))',
@@ -480,7 +483,7 @@ export default function DashboardPage() {
                     </td>
                     <td style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{b.branch}</td>
                     <td style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '13px' }}>
-                      ${b.totalCost}
+                      {formatPrice(b.totalCost)}
                     </td>
                     <td>
                       <span className={`badge badge-${b.status.toLowerCase()}`}>

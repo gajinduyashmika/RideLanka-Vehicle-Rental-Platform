@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { vehiclesApi, VehicleResponse } from '@/lib/api';
 import { useToast } from '@/components/Toast';
+import { useCurrency } from '@/lib/currency-context';
 
 const PlusIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -60,6 +61,7 @@ const statusColors: Record<string, { text: string; bg: string; border: string }>
 };
 
 export default function FleetPage() {
+  const { formatPrice } = useCurrency();
   const [vehicles, setVehicles] = useState<VehicleResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('ALL');
@@ -236,7 +238,7 @@ export default function FleetPage() {
                       </td>
                       <td style={{ fontSize: '13px' }}>{v.transmission}</td>
                       <td style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '14px' }}>
-                        ${v.dailyRate}
+                        {formatPrice(v.dailyRate)}
                       </td>
                       <td style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{v.branch}</td>
                       <td>

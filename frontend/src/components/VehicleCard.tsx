@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { VehicleResponse } from '@/lib/api';
+import { useCurrency } from '@/lib/currency-context';
 
 interface VehicleCardProps {
   vehicle: VehicleResponse;
@@ -92,9 +93,10 @@ const GearIcon = () => (
   </svg>
 );
 
-export default function VehicleCard({ vehicle, showStatus = false }: VehicleCardProps) {
+export default function VehicleCard({ vehicle, showStatus = true }: VehicleCardProps) {
   const [wishlisted, setWishlisted] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const { formatPrice } = useCurrency();
 
   const meta = categoryMeta[vehicle.category] || categoryMeta.CAR;
   const isAvailable = vehicle.status === 'AVAILABLE';
@@ -324,8 +326,8 @@ export default function VehicleCard({ vehicle, showStatus = false }: VehicleCard
             borderTop: '1px solid var(--border-subtle)',
           }}>
             <div>
-              <span style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-                ${vehicle.dailyRate}
+              <span style={{ fontSize: '19px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+                {formatPrice(vehicle.dailyRate)}
               </span>
               <span style={{ fontSize: '12px', color: 'var(--text-muted)', marginLeft: '3px' }}>/day</span>
             </div>

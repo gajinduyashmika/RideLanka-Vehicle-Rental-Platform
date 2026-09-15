@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { bookingsApi, BookingResponse } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/Toast';
+import { useCurrency } from '@/lib/currency-context';
 
 // ─── Icons ────────────────────────────────────────────────────────────────
 const CarIcon = () => (
@@ -78,6 +79,7 @@ const tabs = [
 
 function BookingCard({ booking, onCancel }: { booking: BookingResponse; onCancel: (id: string) => void }) {
   const [cancelling, setCancelling] = useState(false);
+  const { formatPrice } = useCurrency();
   const sc = statusConfig[booking.status] ?? { badge: '', label: booking.status, color: 'var(--text-muted)' };
 
   const startFmt = new Date(booking.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -143,10 +145,10 @@ function BookingCard({ booking, onCancel }: { booking: BookingResponse; onCancel
                 fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em',
                 background: 'var(--grad-brand)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
               }}>
-                ${booking.totalCost}
+                {formatPrice(booking.totalCost)}
               </div>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500 }}>
-                {days} day{days !== 1 ? 's' : ''} · ${(booking.totalCost / days).toFixed(0)}/day
+                {days} day{days !== 1 ? 's' : ''} · {formatPrice(booking.totalCost / days)}/day
               </div>
             </div>
           </div>

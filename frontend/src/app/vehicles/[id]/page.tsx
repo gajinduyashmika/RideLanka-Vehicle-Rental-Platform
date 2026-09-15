@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { vehiclesApi, bookingsApi, VehicleResponse } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/components/Toast';
+import { useCurrency } from '@/lib/currency-context';
 
 // ─── Icons ────────────────────────────────────────────────────────────────
 const BackIcon = () => (
@@ -105,15 +106,15 @@ const features = [
 
 const policies = [
   { title: 'Cancellation Policy', body: 'Free cancellation up to 24 hours before pick-up. 50% refund within 12 hours. No refund within 6 hours of pick-up.' },
-  { title: 'Fuel Policy', body: 'Vehicle is provided with a full tank. Please return with a full tank or a refuelling charge of $15 applies.' },
+  { title: 'Fuel Policy', body: 'Vehicle is provided with a full tank. Please return with a full tank or a refuelling charge of Rs. 4,500 applies.' },
   { title: 'Damage Policy', body: 'Minor damage covered by included insurance. Major damage or theft requires excess payment as agreed at booking.' },
   { title: 'Late Return', body: 'Returns more than 60 minutes late will be charged at the daily rate pro-rated per hour.' },
 ];
 
 const insuranceOptions = [
   { id: 'basic', label: 'Basic Coverage', price: 0, desc: 'Included — third party liability' },
-  { id: 'standard', label: 'Standard Coverage', price: 8, desc: 'Collision damage waiver included' },
-  { id: 'premium', label: 'Premium Coverage', price: 18, desc: 'Full coverage, zero excess' },
+  { id: 'standard', label: 'Standard Coverage', price: 2500, desc: 'Collision damage waiver included' },
+  { id: 'premium', label: 'Premium Coverage', price: 5000, desc: 'Full coverage, zero excess' },
 ];
 
 export default function VehicleDetailPage() {
@@ -121,6 +122,7 @@ export default function VehicleDetailPage() {
   const router = useRouter();
   const { isAuthenticated, isAdmin } = useAuth();
   const { toast } = useToast();
+  const { formatPrice } = useCurrency();
 
   const [vehicle, setVehicle] = useState<VehicleResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -179,7 +181,7 @@ export default function VehicleDetailPage() {
         startDate,
         endDate,
       });
-      toast(`Booking confirmed! ID: ${booking.id.slice(0, 8).toUpperCase()} · Total: $${booking.totalCost}`, 'success');
+      toast(`Booking confirmed! ID: ${booking.id.slice(0, 8).toUpperCase()} · Total: ${formatPrice(booking.totalCost)}`, 'success');
       setStartDate('');
       setEndDate('');
     } catch (err: unknown) {
@@ -381,7 +383,7 @@ export default function VehicleDetailPage() {
                   <h3 style={{ fontSize: '15px', fontWeight: 700, marginBottom: '16px' }}>Quick Facts</h3>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                     {[
-                      { label: 'Daily Rate', value: `$${vehicle.dailyRate}` },
+                      { label: 'Daily Rate', value: `${formatPrice(vehicle.dailyRate)} / day` },
                       { label: 'Category', value: vehicle.category },
                       { label: 'Branch', value: vehicle.branch },
                       { label: 'Status', value: vehicle.status },
@@ -464,7 +466,7 @@ export default function VehicleDetailPage() {
               {/* Price header */}
               <div style={{ marginBottom: '20px' }}>
                 <div className="price-display" style={{ alignItems: 'baseline' }}>
-                  <span className="price-amount" style={{ fontSize: '36px' }}>${vehicle.dailyRate}</span>
+                  <span className="price-amount" style={{ fontSize: '32px' }}>{formatPrice(vehicle.dailyRate)}</span>
                   <span className="price-unit" style={{ fontSize: '15px' }}>/day</span>
                 </div>
                 <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>All fees included · No surprises</p>
@@ -538,7 +540,7 @@ export default function VehicleDetailPage() {
                           <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{opt.desc}</div>
                         </div>
                         <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', flexShrink: 0 }}>
-                          {opt.price === 0 ? 'Free' : `+$${opt.price}/d`}
+                          {opt.price === 0 ? 'Free' : `+${formatPrice(opt.price)}/d`}
                         </div>
                       </button>
                     ))}
@@ -555,13 +557,13 @@ export default function VehicleDetailPage() {
                     fontSize: '13px',
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-muted)', marginBottom: '6px' }}>
-                      <span>${vehicle.dailyRate} × {days} day{days !== 1 ? 's' : ''}</span>
-                      <span>${baseTotal.toFixed(2)}</span>
+                      <span>{formatPrice(vehicle.dailyRate)} × {days} day{days !== 1 ? 's' : ''}</span>
+                      <span>{formatPrice(baseTotal)}</span>
                     </div>
                     {insuranceDaily > 0 && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-muted)', marginBottom: '6px' }}>
                         <span>Insurance × {days} day{days !== 1 ? 's' : ''}</span>
-                        <span>${insuranceTotal.toFixed(2)}</span>
+                        <span>{formatPrice(insuranceTotal)}</span>
                       </div>
                     )}
                     <div style={{ height: '1px', background: 'var(--border-subtle)', margin: '8px 0' }} />
@@ -571,7 +573,7 @@ export default function VehicleDetailPage() {
                       color: 'var(--text-primary)',
                     }}>
                       <span>Total</span>
-                      <span className="grad-text">${totalCost.toFixed(2)}</span>
+                      <span className="grad-text">{formatPrice(totalCost)}</span>
                     </div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '6px', textAlign: 'center' }}>
                       {days} day{days !== 1 ? 's' : ''} rental · No deposit required
@@ -595,7 +597,7 @@ export default function VehicleDetailPage() {
                   ) : !isAuthenticated ? (
                     'Sign In to Reserve'
                   ) : (
-                    `Reserve Now${days > 0 ? ` · $${totalCost.toFixed(2)}` : ''}`
+                    `Reserve Now${days > 0 ? ` · ${formatPrice(totalCost)}` : ''}`
                   )}
                 </button>
 

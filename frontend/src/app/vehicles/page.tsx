@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import VehicleCard from '@/components/VehicleCard';
 import SkeletonCard from '@/components/SkeletonCard';
+import { useCurrency } from '@/lib/currency-context';
 import { vehiclesApi, VehicleResponse } from '@/lib/api';
 
 // ─── Icons ────────────────────────────────────────────────────────────────
@@ -118,16 +120,18 @@ function CheckOption({
 }
 
 export default function VehiclesPage() {
+  const { formatPrice } = useCurrency();
   const [allVehicles, setAllVehicles] = useState<VehicleResponse[]>([]);
   const [vehicles, setVehicles] = useState<VehicleResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('default');
+  const [maxRateLimit, setMaxRateLimit] = useState<number>(30000);
   const [filters, setFilters] = useState<Filters>({
     categories: [],
     transmissions: [],
     branches: [],
-    maxPrice: 200,
+    maxPrice: 30000,
     status: '',
   });
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -139,6 +143,11 @@ export default function VehiclesPage() {
     try {
       const data = await vehiclesApi.getAll();
       setAllVehicles(data);
+      if (data && data.length > 0) {
+        const highest = Math.max(...data.map(v => v.dailyRate));
+        setMaxRateLimit(highest);
+        setFilters(f => ({ ...f, maxPrice: highest }));
+      }
     } catch {
       // Backend may not be running
     } finally {
@@ -196,17 +205,18 @@ export default function VehiclesPage() {
   };
 
   const clearFilters = () => {
-    setFilters({ categories: [], transmissions: [], branches: [], maxPrice: 200, status: '' });
+    setFilters({ categories: [], transmissions: [], branches: [], maxPrice: maxRateLimit, status: '' });
     setSortBy('default');
   };
 
   const hasActiveFilters = filters.categories.length > 0 || filters.transmissions.length > 0 ||
-    filters.branches.length > 0 || filters.maxPrice < 200 || filters.status !== '';
+    filters.branches.length > 0 || filters.maxPrice < maxRateLimit || filters.status !== '';
 
   const activeFilterCount = filters.categories.length + filters.transmissions.length +
-    filters.branches.length + (filters.maxPrice < 200 ? 1 : 0) + (filters.status ? 1 : 0);
+    filters.branches.length + (filters.maxPrice < maxRateLimit ? 1 : 0) + (filters.status ? 1 : 0);
 
-  const maxPriceInFleet = Math.max(200, ...allVehicles.map(v => v.dailyRate));
+  const maxPriceInFleet = maxRateLimit;
+  const minPriceInFleet = allVehicles.length > 0 ? Math.min(...allVehicles.map(v => v.dailyRate)) : 4500;
 
   return (
     <div style={{ minHeight: 'calc(100vh - 68px)' }}>
@@ -345,6 +355,16 @@ export default function VehiclesPage() {
                   {filters.status} <XIcon />
                 </button>
               )}
+              {filters.maxPrice < maxPriceInFleet && (
+                <button onClick={() => setFilters(f => ({ ...f, maxPrice: maxPriceInFleet }))} style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  padding: '4px 10px', borderRadius: 'var(--r-full)',
+                  background: 'rgba(232,160,32,0.1)', border: '1px solid var(--amber-border)',
+                  color: 'var(--amber)', fontSize: '12px', fontWeight: 600, cursor: 'pointer',
+                }}>
+                  Up to {formatPrice(filters.maxPrice)} <XIcon />
+                </button>
+              )}
               <button onClick={clearFilters} style={{
                 padding: '4px 10px', borderRadius: 'var(--r-full)',
                 background: 'transparent', border: '1px solid var(--border-default)',
@@ -439,23 +459,24 @@ export default function VehiclesPage() {
                     }}>
                       <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Up to</span>
                       <span style={{
-                        fontSize: '16px', fontWeight: 700,
-                        color: 'var(--teal-400)',
+                        fontSize: '15px', fontWeight: 700,
+                        color: 'var(--amber)',
                       }}>
-                        ${filters.maxPrice}/day
+                        {formatPrice(filters.maxPrice)}/day
                       </span>
                     </div>
                     <input
                       type="range"
                       className="range-slider"
-                      min={10}
+                      min={minPriceInFleet}
                       max={maxPriceInFleet}
+                      step={500}
                       value={filters.maxPrice}
                       onChange={e => setFilters(f => ({ ...f, maxPrice: Number(e.target.value) }))}
                     />
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
-                      <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>$10</span>
-                      <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>${maxPriceInFleet}</span>
+                      <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{formatPrice(minPriceInFleet)}</span>
+                      <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{formatPrice(maxPriceInFleet)}</span>
                     </div>
                   </div>
                 </FilterSection>

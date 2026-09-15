@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { bookingsApi, BookingResponse } from '@/lib/api';
 import { useToast } from '@/components/Toast';
+import { useCurrency } from '@/lib/currency-context';
 
 const RefreshIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -12,6 +13,7 @@ const RefreshIcon = () => (
 );
 
 export default function AdminBookingsPage() {
+  const { formatPrice } = useCurrency();
   const [bookings, setBookings] = useState<BookingResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('ALL');
@@ -87,7 +89,7 @@ export default function AdminBookingsPage() {
           marginBottom: '24px',
         }}>
           {[
-            { label: 'Total Revenue', value: `$${bookings.filter(b => b.status !== 'CANCELLED').reduce((s, b) => s + Number(b.totalCost), 0).toLocaleString()}`, color: 'var(--amber-400)' },
+            { label: 'Total Revenue', value: formatPrice(bookings.filter(b => b.status !== 'CANCELLED').reduce((s, b) => s + Number(b.totalCost), 0)), color: 'var(--amber-400)' },
             { label: 'Active Bookings', value: counts.CONFIRMED, color: 'var(--green-400)' },
             { label: 'Completed', value: counts.COMPLETED, color: 'var(--blue-400)' },
             { label: 'Cancelled', value: counts.CANCELLED, color: 'var(--red-400)' },
@@ -192,7 +194,7 @@ export default function AdminBookingsPage() {
                       {new Date(b.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </td>
                     <td style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '14px' }}>
-                      ${b.totalCost}
+                      {formatPrice(b.totalCost)}
                     </td>
                     <td>
                       <span className={`badge badge-${b.status.toLowerCase()}`}>

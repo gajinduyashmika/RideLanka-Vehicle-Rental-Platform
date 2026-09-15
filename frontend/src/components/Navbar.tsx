@@ -4,13 +4,17 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import { useCurrency, CURRENCIES, CurrencyCode } from '@/lib/currency-context';
 
 export default function Navbar() {
   const { user, logout, isAdmin, isAuthenticated } = useAuth();
+  const { currency, setCurrency, activeCurrencyConfig } = useCurrency();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [currencyOpen, setCurrencyOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const currencyRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -25,6 +29,9 @@ export default function Navbar() {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
       }
+      if (currencyRef.current && !currencyRef.current.contains(e.target as Node)) {
+        setCurrencyOpen(false);
+      }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -33,6 +40,7 @@ export default function Navbar() {
   useEffect(() => {
     setMobileOpen(false);
     setDropdownOpen(false);
+    setCurrencyOpen(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -97,6 +105,71 @@ export default function Navbar() {
 
           {/* Right */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+            {/* Currency Selector */}
+            <div className="dropdown" ref={currencyRef}>
+              <button
+                type="button"
+                onClick={() => setCurrencyOpen(v => !v)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  padding: '6px 12px',
+                  background: 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${currencyOpen ? 'var(--amber)' : 'var(--border)'}`,
+                  borderRadius: 'var(--r-full)',
+                  cursor: 'pointer',
+                  color: 'var(--text-primary)',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  transition: 'all var(--t-fast)',
+                  fontFamily: 'inherit',
+                }}
+                title="Select Currency"
+              >
+                <span style={{ color: 'var(--amber)', fontSize: '13px', fontWeight: 700 }}>
+                  {activeCurrencyConfig.symbol}
+                </span>
+                <span>{currency}</span>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: 'transform var(--t-fast)', transform: currencyOpen ? 'rotate(180deg)' : '' }}>
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </button>
+
+              {currencyOpen && (
+                <div className="dropdown-menu" style={{ minWidth: '190px', right: 0 }}>
+                  <div style={{ padding: '6px 12px 8px', borderBottom: '1px solid var(--border)', marginBottom: '4px' }}>
+                    <div className="label-upper" style={{ fontSize: '10px' }}>Select Currency</div>
+                  </div>
+                  {(Object.keys(CURRENCIES) as CurrencyCode[]).map(code => {
+                    const c = CURRENCIES[code];
+                    const active = currency === code;
+                    return (
+                      <button
+                        key={code}
+                        type="button"
+                        onClick={() => {
+                          setCurrency(code);
+                          setCurrencyOpen(false);
+                        }}
+                        className="dropdown-item"
+                        style={{
+                          justifyContent: 'space-between',
+                          background: active ? 'var(--amber-subtle)' : undefined,
+                          color: active ? 'var(--amber)' : undefined,
+                          fontWeight: active ? 700 : 500,
+                        }}
+                      >
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ color: active ? 'var(--amber)' : 'var(--text-muted)', width: '22px', display: 'inline-block' }}>{c.symbol}</span>
+                          <span>{c.code}</span>
+                        </span>
+                        <span style={{ fontSize: '11px', color: active ? 'var(--amber)' : 'var(--text-muted)' }}>{c.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
             {isAuthenticated ? (
               <div className="dropdown" ref={dropdownRef}>
                 <button
@@ -224,12 +297,46 @@ export default function Navbar() {
               color: isActive(link.href) ? 'var(--amber)' : 'var(--text-secondary)',
               background: isActive(link.href) ? 'var(--amber-subtle)' : 'transparent',
               marginBottom: '2px',
-              transition: 'all var(--t-fast)',
             }}>
               {link.label}
             </Link>
           ))}
         </nav>
+
+        {/* Mobile Currency Selector */}
+        <div style={{ padding: '16px', borderTop: '1px solid var(--border)' }}>
+          <div className="label-upper" style={{ fontSize: '10px', marginBottom: '10px' }}>Currency</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
+            {(Object.keys(CURRENCIES) as CurrencyCode[]).map(code => {
+              const active = currency === code;
+              return (
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() => setCurrency(code)}
+                  style={{
+                    padding: '7px 8px',
+                    borderRadius: 'var(--r-sm)',
+                    border: `1px solid ${active ? 'var(--amber)' : 'var(--border)'}`,
+                    background: active ? 'var(--amber-subtle)' : 'rgba(255,255,255,0.02)',
+                    color: active ? 'var(--amber)' : 'var(--text-secondary)',
+                    fontSize: '12px',
+                    fontWeight: active ? 700 : 500,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '4px',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  <span style={{ fontSize: '11px', color: active ? 'var(--amber)' : 'var(--text-muted)' }}>{CURRENCIES[code].symbol}</span>
+                  <span>{code}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         <div style={{ padding: '16px', borderTop: '1px solid var(--border)' }}>
           {isAuthenticated ? (

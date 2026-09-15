@@ -106,10 +106,10 @@ export default function NewVehiclePage() {
             </select>
           </div>
           <div>
-            <label className="input-label">Daily Rate ($)</label>
-            <input type="number" value={form.dailyRate}
-              onChange={e => handleChange('dailyRate', parseFloat(e.target.value))}
-              className="input-field" min={0.01} step={0.01} required />
+            <label className="input-label">Daily Rate (LKR - Rs.)</label>
+            <input type="number" value={form.dailyRate || ''}
+              onChange={e => handleChange('dailyRate', parseFloat(e.target.value) || 0)}
+              className="input-field" min={100} step={100} placeholder="e.g. 8500" required />
           </div>
           <div>
             <label className="input-label">Branch</label>
